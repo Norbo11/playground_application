@@ -31,7 +31,7 @@ def three_get():  # noqa: E501
 
     :rtype: Number
     """
-    logger.error('Executed three')
+    logger.error('Executed three ')
     time.sleep(3)
     return Number(3)
 
