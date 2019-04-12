@@ -10,8 +10,8 @@ from datetime import datetime
 import os
 import sys
 
-app = connexion.App(__name__, specification_dir='./swagger/')
-app.add_api('swagger.yaml', arguments={'title': 'Playground Application'})
+app = connexion.App(__name__, specification_dir='./openapi/')
+app.add_api('openapi.yaml', arguments={'title': 'Playground Application'})
 
 flask_app = app.app
 flask_app.json_encoder = JSONEncoder

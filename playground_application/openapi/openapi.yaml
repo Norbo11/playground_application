@@ -1,0 +1,86 @@
+openapi: 3.0.0
+info:
+  title: Playground Application
+  version: 0.0.1
+servers:
+- url: http://localhost:4000/api
+- url: http://localhost:8081/api
+paths:
+  /one:
+    get:
+      description: The one.
+      operationId: playground_application_controllers_default_controller_one_get
+      parameters: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+          description: "1"
+      summary: One.
+      x-openapi-router-controller: playground_application.controllers.default_controller
+  /two:
+    get:
+      description: The two.
+      operationId: playground_application_controllers_default_controller_two_get
+      parameters: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+          description: "2"
+      summary: Two.
+      x-openapi-router-controller: playground_application.controllers.default_controller
+  /three:
+    get:
+      description: The three.
+      operationId: playground_application_controllers_default_controller_three_get
+      parameters: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+          description: "3"
+      summary: Three.
+      x-openapi-router-controller: playground_application.controllers.default_controller
+  /load:
+    get:
+      description: Load something in pandas.
+      operationId: playground_application_controllers_default_controller_load
+      parameters: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadedCsv'
+          description: "3"
+      summary: Load.
+      x-openapi-router-controller: playground_application.controllers.default_controller
+components:
+  schemas:
+    Number:
+      example:
+        i: 0
+      properties:
+        i:
+          format: int32
+          type: integer
+      required:
+      - i
+    LoadedCsv:
+      properties:
+        rows:
+          additionalProperties:
+            items:
+              format: float
+              type: number
+            type: array
+          type: object
+      required:
+      - rows

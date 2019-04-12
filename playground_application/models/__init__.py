@@ -3,4 +3,5 @@
 # flake8: noqa
 from __future__ import absolute_import
 # import models into model package
+from playground_application.models.loaded_csv import LoadedCsv
 from playground_application.models.number import Number
