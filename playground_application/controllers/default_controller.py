@@ -2,13 +2,12 @@ import connexion
 import six
 import logging
 import time
-import pandas as pd
 
 from flask import current_app
 
 from playground_application.models.loaded_csv import LoadedCsv
 from playground_application.models.number import Number  # noqa: E501
-from playground_application import util
+from playground_application import controller_util
 
 
 def one_get():
@@ -55,7 +54,7 @@ def two_get():
 
 
 def load():
-    df = pd.read_csv("playground_application/large.csv")
+    df = controller_util.load_large_csv()
     rows = df.to_dict()
     return LoadedCsv(rows={"1": [1.0, 2.0]}).to_dict()
 
