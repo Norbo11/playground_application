@@ -10,6 +10,10 @@ from playground_application.models.number import Number  # noqa: E501
 from playground_application import controller_util
 
 
+def sleep(i):
+    time.sleep(i)
+    return i
+
 def one_get():
     """One.
 
@@ -27,6 +31,7 @@ def one_get():
     return Number(1).to_dict()
 
 
+
 def three_get():
     """Three.
 
@@ -36,7 +41,7 @@ def three_get():
     :rtype: Number
     """
     current_app.logger.info('Executed three ')
-    time.sleep(3)
+    x = [sleep(1), sleep(1), sleep(1)]
     return Number(3).to_dict()
 
 
@@ -49,12 +54,22 @@ def two_get():
     :rtype: Number
     """
     current_app.logger.info('Executed two')
-    time.sleep(2)
+    sleep(1)
+    sleep(1)
     return Number(2).to_dict()
 
 
+def new_function():
+    return Number(1).to_dict()
+
+
 def load():
-    df = controller_util.load_large_csv()
+    df = controller_util.something()
     rows = df.to_dict()
+
     return LoadedCsv(rows={"1": [1.0, 2.0]}).to_dict()
 
+
+def list_comprehension():
+    numbers = controller_util.list_comprehension()
+    return numbers

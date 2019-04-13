@@ -58,11 +58,21 @@ paths:
                 $ref: '#/components/schemas/LoadedCsv'
           description: "3"
       summary: Load.
+  /list_comprehension:
+    get:
+      description: List comprehension.
+      operationId: playground_application.controllers.default_controller.list_comprehension
+      responses:
+        200:
+          description: 'List comprehension'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfNumbers'
 components:
   schemas:
     Number:
-      example:
-        i: 0
+      type: object
       properties:
         i:
           format: int32
@@ -70,6 +80,7 @@ components:
       required:
       - i
     LoadedCsv:
+      type: object
       properties:
         rows:
           additionalProperties:
@@ -80,3 +91,7 @@ components:
           type: object
       required:
       - rows
+    ListOfNumbers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Number'

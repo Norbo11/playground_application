@@ -15,7 +15,7 @@ class Number(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, i=None):  # noqa: E501
+    def __init__(self, i: object = None) -> object:  # noqa: E501
         """Number - a model defined in OpenAPI
 
         :param i: The i of this Number.  # noqa: E501
