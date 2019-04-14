@@ -15,6 +15,6 @@ deploy:
   stage: deploy
   script:
     - docker stop playground_application_prod || true
-    - docker run --detach --cap-add=SYS_PTRACE -p 4001:8081 playground_application_prod
+    - docker run --detach --cap-add=SYS_PTRACE -p 4001:8081 --name playground_application_prod playground_application
   only:
     - master
