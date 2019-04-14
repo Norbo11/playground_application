@@ -2,6 +2,7 @@ build:
   stage: build
   script:
     - shopt -s extglob
+    - shopt -s dotglob
     - mv playground_application playground_application_temp
     - mkdir playground_application
     - mv !(playground_application) playground_application
