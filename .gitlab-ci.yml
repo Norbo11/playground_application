@@ -3,7 +3,7 @@ build:
   script:
     - mv playground_application playground_application_temp
     - mkdir playground_application
-    - mv * playground_application
+    - mv ^playground_application playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
     - cp /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
     - cp /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
