@@ -6,8 +6,8 @@ build:
     - mkdir playground_application
     - mv !(playground_application) playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
-    - cp /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
-    - cp /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
+    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
+    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
     - docker build --tag=playground_application .
 
 deploy:
