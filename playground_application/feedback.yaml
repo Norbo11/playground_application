@@ -1,0 +1,8 @@
+application_name: playground_application
+metric_backend_url: http://host.docker.internal:8080/api
+
+# These directories are relative to flask_app.root_path
+git_base_path: "../"
+source_base_path: "../"
+instrument_file_globs:
+  - "playground_application/**"

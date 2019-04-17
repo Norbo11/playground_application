@@ -20,10 +20,7 @@ flask_app.config.update(
     DEBUG=True,
 )
 
-# TODO: More robust way of providing path?
-
-base_path = os.path.split(os.path.dirname(sys.argv[0]))[0]
-instrument_flask(flask_app, base_path)
+instrument_flask(flask_app, './feedback.yaml')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8081, debug=True)
