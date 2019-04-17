@@ -23,7 +23,11 @@ def one_get():
     :rtype: Number
     """
     #raise Exception('oh damn')
+
     current_app.logger.info('Executed one')
+    time.sleep(2)
+
+
     time.sleep(1)
 
     from pprint import pprint
