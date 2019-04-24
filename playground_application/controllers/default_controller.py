@@ -81,14 +81,17 @@ def branch():
     x = random.random()
 
     if x < 0.7:
-        x = random.random()
+        y = random.random()
 
-        if x < 0.5:
+        if y < 0.5:
             sleep(1)
         else:
             sleep(2)
 
-    return Number(x).to_dict()
+    return {
+        'first': Number(x).to_dict(),
+        'second': Number(y).to_dict()
+    }
 
 
 def list_comprehension():

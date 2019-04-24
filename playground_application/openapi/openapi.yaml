@@ -79,7 +79,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Number'
+                type: object
+                properties:
+                  first:
+                    $ref: '#/components/schemas/Number'
+                  second:
+                    $ref: '#/components/schemas/Number'
 components:
   schemas:
     Number:
