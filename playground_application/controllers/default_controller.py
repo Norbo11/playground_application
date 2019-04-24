@@ -79,6 +79,7 @@ def branch():
     import random
 
     x = random.random()
+    y = 0
 
     if x < 0.7:
         y = random.random()
