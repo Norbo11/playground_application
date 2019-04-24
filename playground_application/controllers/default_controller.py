@@ -75,6 +75,22 @@ def load():
     return LoadedCsv(rows={"1": [1.0, 2.0]}).to_dict()
 
 
+def branch():
+    import random
+
+    x = random.random()
+
+    if x < 0.7:
+        x = random.random()
+
+        if x < 0.5:
+            sleep(1)
+        else:
+            sleep(2)
+
+    return Number(x).to_dict()
+
+
 def list_comprehension():
     numbers = controller_util.list_comprehension()
     return numbers

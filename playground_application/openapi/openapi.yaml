@@ -69,6 +69,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListOfNumbers'
+  /branch:
+    get:
+      description: If statements
+      operationId: playground_application.controllers.default_controller.branch
+      responses:
+        200:
+          description: 'Number'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
 components:
   schemas:
     Number:
