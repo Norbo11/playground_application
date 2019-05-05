@@ -13,3 +13,8 @@ def list_comprehension():
     return [Number(math.factorial(i))
             for i
             in range(1_000)]
+
+
+def throw_exception():
+    raise Exception('oh damn')
+

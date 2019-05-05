@@ -22,32 +22,9 @@ def one_get():
 
     :rtype: Number
     """
-    raise Exception('oh damn')
-
     current_app.logger.info('Executed one')
-
-
-    time.sleep(2)
-
-
     time.sleep(1)
-
-    from pprint import pprint
-    pprint(Number(1).to_dict())
     return Number(1).to_dict()
-
-
-
-def three_get():
-    """Three.
-
-    The three.
-
-    :rtype: Number
-    """
-    current_app.logger.info('Executed three ')
-    x = [sleep(1), sleep(1), sleep(1)]
-    return Number(3).to_dict()
 
 
 def two_get():
@@ -61,11 +38,20 @@ def two_get():
     current_app.logger.info('Executed two')
     sleep(1)
     sleep(1)
+    controller_util.throw_exception()
     return Number(2).to_dict()
 
 
-def new_function():
-    return Number(1).to_dict()
+def three_get():
+    """Three.
+
+    The three.
+
+    :rtype: Number
+    """
+    current_app.logger.info('Executed three')
+    x = [sleep(1), sleep(1), sleep(1)]
+    return Number(3).to_dict()
 
 
 def load():
