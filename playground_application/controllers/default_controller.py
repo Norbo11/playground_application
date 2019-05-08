@@ -71,7 +71,10 @@ def branch():
         y = random.random()
 
         if y < 0.8:
-            sleep(1)
+
+
+
+            sleep(3)
         else:
             sleep(2)
 
