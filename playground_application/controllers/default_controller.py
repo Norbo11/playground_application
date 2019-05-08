@@ -70,7 +70,7 @@ def branch():
     if x < 0.7:
         y = random.random()
 
-        if y < 0.5:
+        if y < 0.8:
             sleep(1)
         else:
             sleep(2)
