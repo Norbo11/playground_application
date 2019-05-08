@@ -71,13 +71,14 @@ def branch():
         y = random.random()
 
         if y < 0.8:
-
-
-
-            sleep(4)
+            sleep(1)
         else:
-            sleep(2)
+            sleep(1)
 
+        if y < 0.4:
+            sleep(1)
+
+    sleep(1)
     return {
         'first': Number(x).to_dict(),
         'second': Number(y).to_dict()
