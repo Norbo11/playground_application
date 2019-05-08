@@ -74,7 +74,7 @@ def branch():
 
 
 
-            sleep(3)
+            sleep(4)
         else:
             sleep(2)
 
