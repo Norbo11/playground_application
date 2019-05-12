@@ -22,7 +22,7 @@ def one_get():
 
     :rtype: Number
     """
-    current_app.logger.info('Executed one')
+    current_app.logger.info('Executed one (woke up at {})', str(time.time()))
     time.sleep(1)
     return Number(1).to_dict()
 
