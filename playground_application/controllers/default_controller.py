@@ -11,6 +11,7 @@ from playground_application import controller_util
 
 
 def sleep(i):
+    i = 4
     time.sleep(i)
     return i
 
