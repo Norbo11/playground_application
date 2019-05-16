@@ -38,6 +38,7 @@ def two_get():
     current_app.logger.info('Executed two')
     sleep(1)
     sleep(1)
+    sleep(0.5)
     controller_util.throw_exception()
     return Number(2).to_dict()
 
