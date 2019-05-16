@@ -67,6 +67,8 @@ def branch():
     x = random.random()
     y = 0
 
+    sleep(0.5)
+
     if x < 0.7:
         y = random.random()
 
