@@ -1,0 +1,529 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="438" onload="init(evt)" viewBox="0 0 1200 438" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+	}
+
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom();
+			zoom(target);
+		}
+		else if (e.target.id == "unzoom") unzoom();
+		else if (e.target.id == "search") search_prompt();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+	}, false)
+
+	// functions
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+		return;
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		// Fit in full text width
+		if (/^ *$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
+			return;
+
+		for (var x = txt.length - 2; x > 0; x--) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+	}
+	function unzoom() {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			update_text(el[i]);
+		}
+	}
+
+	// search
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)", "");
+			if (term != null) {
+				search(term)
+			}
+		} else {
+			reset_search();
+			searching = 0;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		var re = new RegExp(term);
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="438.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >Flame Graph</text>
+<text id="details" x="10.00" y="421" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="matched" x="1090.00" y="421" > </text>
+<g id="frames">
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:dispatch_request:1799 (223 samples, 33.04%)</title><rect x="796.7" y="133" width="389.8" height="15.0" fill="rgb(225,89,25)" rx="2" ry="2" />
+<text  x="799.67" y="143.5" >/usr/local/lib/python3.6/site-packages/flask/app.py:d..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/selectors.py:select:376 (1 samples, 0.15%)</title><rect x="1188.3" y="37" width="1.7" height="15.0" fill="rgb(230,50,22)" rx="2" ry="2" />
+<text  x="1191.25" y="47.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:run_simple:988 (225 samples, 33.33%)</title><rect x="10.0" y="293" width="393.3" height="15.0" fill="rgb(248,96,29)" rx="2" ry="2" />
+<text  x="13.00" y="303.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:execute:292 (225 samples, 33.33%)</title><rect x="796.7" y="213" width="393.3" height="15.0" fill="rgb(210,80,3)" rx="2" ry="2" />
+<text  x="799.67" y="223.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/debug/__init__.py:debug_application:317 (225 samples, 33.33%)</title><rect x="796.7" y="197" width="393.3" height="15.0" fill="rgb(252,15,18)" rx="2" ry="2" />
+<text  x="799.67" y="207.5" >/usr/local/lib/python3.6/site-packages/werkzeug/debug..</text>
+</g>
+<g >
+<title>all (675 samples, 100%)</title><rect x="10.0" y="389" width="1180.0" height="15.0" fill="rgb(237,69,10)" rx="2" ry="2" />
+<text  x="13.00" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/connexion/decorators/decorator.py:wrapper:42 (223 samples, 33.04%)</title><rect x="796.7" y="101" width="389.8" height="15.0" fill="rgb(224,202,48)" rx="2" ry="2" />
+<text  x="799.67" y="111.5" >/usr/local/lib/python3.6/site-packages/connexion/deco..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/_reloader.py:run:195 (1 samples, 0.15%)</title><rect x="10.0" y="261" width="1.7" height="15.0" fill="rgb(227,171,12)" rx="2" ry="2" />
+<text  x="13.00" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:run:943 (225 samples, 33.33%)</title><rect x="10.0" y="309" width="393.3" height="15.0" fill="rgb(227,108,23)" rx="2" ry="2" />
+<text  x="13.00" y="319.5" >/usr/local/lib/python3.6/site-packages/flask/app.py:r..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:handle_one_request:360 (225 samples, 33.33%)</title><rect x="796.7" y="245" width="393.3" height="15.0" fill="rgb(237,142,12)" rx="2" ry="2" />
+<text  x="799.67" y="255.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/app/playground_application/controllers/default_controller.py:three_get:35 (223 samples, 33.04%)</title><rect x="796.7" y="69" width="389.8" height="15.0" fill="rgb(219,56,19)" rx="2" ry="2" />
+<text  x="799.67" y="79.5" >/app/playground_application/controllers/default_contr..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/socketserver.py:process_request_thread:639 (225 samples, 33.33%)</title><rect x="796.7" y="325" width="393.3" height="15.0" fill="rgb(234,186,41)" rx="2" ry="2" />
+<text  x="799.67" y="335.5" >/usr/local/lib/python3.6/socketserver.py:process_requ..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/threading.py:_bootstrap_inner:916 (450 samples, 66.67%)</title><rect x="403.3" y="357" width="786.7" height="15.0" fill="rgb(221,113,26)" rx="2" ry="2" />
+<text  x="406.33" y="367.5" >/usr/local/lib/python3.6/threading.py:_bootstrap_inner:916</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/connexion/decorators/parameter.py:wrapper:218 (223 samples, 33.04%)</title><rect x="796.7" y="85" width="389.8" height="15.0" fill="rgb(209,153,7)" rx="2" ry="2" />
+<text  x="799.67" y="95.5" >/usr/local/lib/python3.6/site-packages/connexion/deco..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/threading.py:run:864 (450 samples, 66.67%)</title><rect x="403.3" y="341" width="786.7" height="15.0" fill="rgb(241,181,47)" rx="2" ry="2" />
+<text  x="406.33" y="351.5" >/usr/local/lib/python3.6/threading.py:run:864</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:full_dispatch_request:1816 (1 samples, 0.15%)</title><rect x="1188.3" y="149" width="1.7" height="15.0" fill="rgb(246,72,54)" rx="2" ry="2" />
+<text  x="1191.25" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/connexion/decorators/decorator.py:wrapper:66 (223 samples, 33.04%)</title><rect x="796.7" y="117" width="389.8" height="15.0" fill="rgb(243,191,25)" rx="2" ry="2" />
+<text  x="799.67" y="127.5" >/usr/local/lib/python3.6/site-packages/connexion/deco..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:handle:325 (225 samples, 33.33%)</title><rect x="796.7" y="277" width="393.3" height="15.0" fill="rgb(231,151,35)" rx="2" ry="2" />
+<text  x="799.67" y="287.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/socketserver.py:finish_request:361 (225 samples, 33.33%)</title><rect x="796.7" y="309" width="393.3" height="15.0" fill="rgb(240,192,42)" rx="2" ry="2" />
+<text  x="799.67" y="319.5" >/usr/local/lib/python3.6/socketserver.py:finish_reque..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/connexion/apps/flask_app.py:run:94 (225 samples, 33.33%)</title><rect x="10.0" y="325" width="393.3" height="15.0" fill="rgb(239,178,31)" rx="2" ry="2" />
+<text  x="13.00" y="335.5" >/usr/local/lib/python3.6/site-packages/connexion/apps..</text>
+</g>
+<g >
+<title>/app/playground_application/__main__.py:&lt;module&gt;:77 (225 samples, 33.33%)</title><rect x="10.0" y="341" width="393.3" height="15.0" fill="rgb(232,140,34)" rx="2" ry="2" />
+<text  x="13.00" y="351.5" >/app/playground_application/__main__.py:&lt;module&gt;:77</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/_reloader.py:run_with_reloader:330 (225 samples, 33.33%)</title><rect x="10.0" y="277" width="393.3" height="15.0" fill="rgb(238,81,0)" rx="2" ry="2" />
+<text  x="13.00" y="287.5" >/usr/local/lib/python3.6/site-packages/werkzeug/_relo..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/runpy.py:_run_code:85 (225 samples, 33.33%)</title><rect x="10.0" y="357" width="393.3" height="15.0" fill="rgb(250,180,0)" rx="2" ry="2" />
+<text  x="13.00" y="367.5" >/usr/local/lib/python3.6/runpy.py:_run_code:85</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/subprocess.py:_communicate:1514 (1 samples, 0.15%)</title><rect x="1188.3" y="53" width="1.7" height="15.0" fill="rgb(208,115,42)" rx="2" ry="2" />
+<text  x="1191.25" y="63.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:full_dispatch_request:1813 (224 samples, 33.19%)</title><rect x="796.7" y="149" width="391.6" height="15.0" fill="rgb(216,179,5)" rx="2" ry="2" />
+<text  x="799.67" y="159.5" >/usr/local/lib/python3.6/site-packages/flask/app.py:f..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/threading.py:_bootstrap:884 (450 samples, 66.67%)</title><rect x="403.3" y="373" width="786.7" height="15.0" fill="rgb(244,36,28)" rx="2" ry="2" />
+<text  x="406.33" y="383.5" >/usr/local/lib/python3.6/threading.py:_bootstrap:884</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:preprocess_request:2089 (1 samples, 0.15%)</title><rect x="1186.5" y="133" width="1.8" height="15.0" fill="rgb(239,167,8)" rx="2" ry="2" />
+<text  x="1189.50" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:process_response:2112 (1 samples, 0.15%)</title><rect x="1188.3" y="117" width="1.7" height="15.0" fill="rgb(233,209,32)" rx="2" ry="2" />
+<text  x="1191.25" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/http/server.py:handle:418 (225 samples, 33.33%)</title><rect x="796.7" y="261" width="393.3" height="15.0" fill="rgb(232,35,28)" rx="2" ry="2" />
+<text  x="799.67" y="271.5" >/usr/local/lib/python3.6/http/server.py:handle:418</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/runpy.py:_run_module_as_main:193 (225 samples, 33.33%)</title><rect x="10.0" y="373" width="393.3" height="15.0" fill="rgb(231,78,26)" rx="2" ry="2" />
+<text  x="13.00" y="383.5" >/usr/local/lib/python3.6/runpy.py:_run_module_as_main..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:wsgi_app:2292 (225 samples, 33.33%)</title><rect x="796.7" y="165" width="393.3" height="15.0" fill="rgb(221,102,49)" rx="2" ry="2" />
+<text  x="799.67" y="175.5" >/usr/local/lib/python3.6/site-packages/flask/app.py:w..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:inner:947 (225 samples, 33.33%)</title><rect x="403.3" y="325" width="393.4" height="15.0" fill="rgb(228,31,38)" rx="2" ry="2" />
+<text  x="406.33" y="335.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/app/playground_application/__main__.py:pyflame_profile_end:57 (1 samples, 0.15%)</title><rect x="1188.3" y="101" width="1.7" height="15.0" fill="rgb(227,23,39)" rx="2" ry="2" />
+<text  x="1191.25" y="111.5" ></text>
+</g>
+<g >
+<title>/app/playground_application/__main__.py:kill_process:52 (1 samples, 0.15%)</title><rect x="1188.3" y="85" width="1.7" height="15.0" fill="rgb(208,89,20)" rx="2" ry="2" />
+<text  x="1191.25" y="95.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/subprocess.py:__init__:709 (1 samples, 0.15%)</title><rect x="1186.5" y="101" width="1.8" height="15.0" fill="rgb(209,21,1)" rx="2" ry="2" />
+<text  x="1189.50" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:serve_forever:715 (225 samples, 33.33%)</title><rect x="403.3" y="309" width="393.4" height="15.0" fill="rgb(211,106,4)" rx="2" ry="2" />
+<text  x="406.33" y="319.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:__call__:2309 (225 samples, 33.33%)</title><rect x="796.7" y="181" width="393.3" height="15.0" fill="rgb(245,167,22)" rx="2" ry="2" />
+<text  x="799.67" y="191.5" >/usr/local/lib/python3.6/site-packages/flask/app.py:_..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/flask/app.py:finalize_request:1833 (1 samples, 0.15%)</title><rect x="1188.3" y="133" width="1.7" height="15.0" fill="rgb(233,131,34)" rx="2" ry="2" />
+<text  x="1191.25" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/serving.py:run_wsgi:302 (225 samples, 33.33%)</title><rect x="796.7" y="229" width="393.3" height="15.0" fill="rgb(234,17,33)" rx="2" ry="2" />
+<text  x="799.67" y="239.5" >/usr/local/lib/python3.6/site-packages/werkzeug/servi..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/socketserver.py:__init__:696 (225 samples, 33.33%)</title><rect x="796.7" y="293" width="393.3" height="15.0" fill="rgb(240,205,53)" rx="2" ry="2" />
+<text  x="799.67" y="303.5" >/usr/local/lib/python3.6/socketserver.py:__init__:696</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/socketserver.py:serve_forever:236 (225 samples, 33.33%)</title><rect x="403.3" y="293" width="393.4" height="15.0" fill="rgb(209,74,5)" rx="2" ry="2" />
+<text  x="406.33" y="303.5" >/usr/local/lib/python3.6/socketserver.py:serve_foreve..</text>
+</g>
+<g >
+<title>/app/playground_application/__main__.py:pyflame_profile:43 (1 samples, 0.15%)</title><rect x="1186.5" y="117" width="1.8" height="15.0" fill="rgb(243,210,11)" rx="2" ry="2" />
+<text  x="1189.50" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/subprocess.py:communicate:843 (1 samples, 0.15%)</title><rect x="1188.3" y="69" width="1.7" height="15.0" fill="rgb(212,171,9)" rx="2" ry="2" />
+<text  x="1191.25" y="79.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/selectors.py:select:376 (225 samples, 33.33%)</title><rect x="403.3" y="277" width="393.4" height="15.0" fill="rgb(207,18,34)" rx="2" ry="2" />
+<text  x="406.33" y="287.5" >/usr/local/lib/python3.6/selectors.py:select:376</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/subprocess.py:_execute_child:1298 (1 samples, 0.15%)</title><rect x="1186.5" y="85" width="1.8" height="15.0" fill="rgb(252,140,28)" rx="2" ry="2" />
+<text  x="1189.50" y="95.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.6/site-packages/werkzeug/_reloader.py:run:207 (224 samples, 33.19%)</title><rect x="11.7" y="261" width="391.6" height="15.0" fill="rgb(230,0,24)" rx="2" ry="2" />
+<text  x="14.75" y="271.5" >/usr/local/lib/python3.6/site-packages/werkzeug/_relo..</text>
+</g>
+</g>
+</svg>

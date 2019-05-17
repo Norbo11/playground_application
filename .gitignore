@@ -3,7 +3,6 @@
 __pycache__
 .idea
 metric_backend_client
-scripts
 flamegraphs
 .large.csv.icloud
 
