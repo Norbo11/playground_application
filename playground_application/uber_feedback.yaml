@@ -1,0 +1,10 @@
+application_name: ride_service
+metric_backend_url: http://host.docker.internal:8080/api
+
+# These directories are relative to flask_app.root_path.
+# feedback.yaml needs to be in the same directory for the IDE plugin to treat the below as relative
+# paths, unless we also sent the flask root path with each profile.
+git_base_path: "../"
+source_base_path: "../"
+instrument_file_globs:
+  - "playground_application/**"
