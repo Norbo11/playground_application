@@ -36,8 +36,8 @@ class DriverAvailabilityService(object):
         self.available_drivers.remove(driver)
 
     def find_driver_candidates(self, start_location):
-        sorted_by_distance = sorted(self.available_drivers, key=lambda driver: self.map_location_client.compute_distance_km(driver.current_location,
-                                                                                                                            start_location), reverse=True)
+        key = lambda driver: self.map_location_client.compute_distance_km(driver.current_location, start_location)
+        sorted_by_distance = sorted(self.available_drivers, key=key, reverse=True)
 
         return sorted_by_distance[:5]
 
