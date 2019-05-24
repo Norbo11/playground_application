@@ -4,10 +4,10 @@ import random
 import math
 import multiprocessing
 import logging
+
+from flask import current_app as flask_app
 from multiprocessing import Queue, Process
 from playground_application.models import Driver as DriverModel, Location, FindRideRequest, FindRideResponse
-
-logger = logging.getLogger("ride_hailing_logger")
 
 
 class Driver(DriverModel):
@@ -127,7 +127,7 @@ class RideService(object):
             if not driver_accepted:
                 drivers_declined += 1
 
-        logger.info(f"{drivers_declined} drivers declined before a ride could be found")
+        flask_app.logger.info(f"{drivers_declined} drivers declined before a ride could be found")
         ride = self.driver_operations_client.create_ride(candidate, find_ride_request)
         return FindRideResponse(driver=ride['driver'], estimated_cost=estimated_price)
 
