@@ -15,22 +15,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                start_location:
-                  $ref: '#/components/schemas/Location'
-                end_location:
-                  $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/FindRideRequest'
       responses:
         200:
+          description: Ride information
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-          description: "1"
+                $ref: '#/components/schemas/FindRideResponse'
 components:
   schemas:
     Location:
@@ -40,3 +32,25 @@ components:
           type: integer
         y:
           type: integer
+    Driver:
+      type: object
+      properties:
+        current_location:
+          $ref: '#/components/schemas/Location'
+        rating:
+          type: integer
+    FindRideRequest:
+      type: object
+      properties:
+        start_location:
+          $ref: '#/components/schemas/Location'
+        end_location:
+          $ref: '#/components/schemas/Location'
+    FindRideResponse:
+      type: object
+      properties:
+        driver:
+          $ref: '#/components/schemas/Driver'
+        estimated_cost:
+          type: number
+          format: double
