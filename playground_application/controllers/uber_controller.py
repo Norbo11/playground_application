@@ -9,17 +9,18 @@ from multiprocessing import Queue, Process
 class Driver(object):
 
     def __init__(self):
-        self.current_location = (random.randint(1, 100), random.randint(1, 100))
+        self.current_location = {
+            'x': random.randint(1, 100),
+            'y': random.randint(1, 100)
+        }
         self.rating = random.random() * 5
 
 
 class MapLocationService(object):
 
     def compute_distance_km(self, a, b):
-        a1, a2 = a
-        b1, b2 = b
         time.sleep(1)
-        return math.sqrt(math.pow(a1 - b1, 2) + math.pow(a2 - b2, 2))
+        return math.sqrt(math.pow(a['x'] - b['x'], 2) + math.pow(a['y'] - b['y'], 2))
 
 
 class DriverAvailabilityService(object):
@@ -60,7 +61,7 @@ class DriverOperationsService(object):
         self.rides = []
 
     def ask_for_ride(self, driver, ride_info):
-        time.sleep(random.randint(3, 10))
+        time.sleep(random.randint(1, 4))
         return random.random() > 0.5
 
     def create_ride(self, driver, ride_info):
