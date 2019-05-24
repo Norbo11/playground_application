@@ -8,7 +8,8 @@ build:
     - mv !(playground_application) playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
     - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
-    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
+#    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
+    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/DockerfileUber .
 #    - docker build --tag=playground_application .
     - docker build --tag=playground_application DockerfileUber
 deploy:
