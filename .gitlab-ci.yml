@@ -11,7 +11,7 @@ build:
 #    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
     - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/DockerfileUber .
 #    - docker build --tag=playground_application .
-    - docker build --tag=playground_application DockerfileUber
+    - docker build --tag=playground_application -f DockerfileUber .
 deploy:
   stage: deploy
   script:
