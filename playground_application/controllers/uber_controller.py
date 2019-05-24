@@ -4,10 +4,26 @@ import random
 import math
 import multiprocessing
 import logging
+from datetime import datetime, timedelta
 
 from flask import current_app as flask_app
 from multiprocessing import Queue, Process
 from playground_application.models import Driver as DriverModel, Location, FindRideRequest, FindRideResponse
+
+
+class DriverNotFoundException(Exception):
+    pass
+
+
+class GoogleMapsService(object):
+
+    def authenticate(self):
+        time.sleep(4)
+        return str(uuid.uuid4())
+
+    def compute_distance_km(self, auth_token, a, b):
+        time.sleep(0.5)
+        return math.sqrt(math.pow(a.x - b.x, 2) + math.pow(a.y - b.y, 2))
 
 
 class Driver(DriverModel):
@@ -25,14 +41,20 @@ class Driver(DriverModel):
 
 class MapLocationService(object):
 
+    def __init__(self, google_maps_client):
+        self.last_auth_token = None
+        self.last_auth_time = datetime.min
+        self.google_maps_client = google_maps_client
+
     def compute_distance_km(self, a, b):
-        time.sleep(1)
-        print(type(a))
-        print(type(b))
-        return math.sqrt(math.pow(a.x - b.x, 2) + math.pow(a.y - b.y, 2))
+        if datetime.now() - self.last_auth_time > timedelta(hours=1):
+            self.last_auth_token = self.google_maps_client.authenticate()
+            self.last_auth_time = datetime.now()
+
+        return self.google_maps_client.compute_distance_km(self.last_auth_token, a, b)
 
 
-class DriverAvailabilityService(object):
+class DriverMatchingService(object):
 
     def __init__(self, map_location_client):
         self.available_drivers = []
@@ -47,23 +69,9 @@ class DriverAvailabilityService(object):
     def find_driver_candidates(self, start_location):
         key = lambda driver: self.map_location_client.compute_distance_km(driver.current_location, start_location)
         sorted_by_distance = sorted(self.available_drivers, key=key, reverse=True)
+        sorted_by_rating = sorted(sorted_by_distance, key=lambda driver: driver.rating, reverse=True)
 
-        return sorted_by_distance[:5]
-
-
-class DriverMatchingService(object):
-
-    def __init__(self, driver_availability_client):
-        self.driver_availability_client = driver_availability_client
-
-    def find_driver(self, ride_info):
-        candidates = self.driver_availability_client.find_driver_candidates(ride_info.start_location)
-
-        if len(candidates) > 0:
-            sorted_by_rating = sorted(candidates, key=lambda driver: driver.rating, reverse=True)
-            return sorted_by_rating[0]
-        else:
-            return None
+        return sorted_by_rating
 
 
 class DriverOperationsService(object):
@@ -72,7 +80,7 @@ class DriverOperationsService(object):
         self.rides = []
 
     def ask_for_ride(self, driver, ride_info):
-        time.sleep(random.randint(1, 4))
+        time.sleep(random.randint(1, 3))
         return random.random() > 0.5
 
     def create_ride(self, driver, ride_info):
@@ -109,40 +117,46 @@ class RideService(object):
         self.pricing_client = pricing_client
 
     def find_ride(self, find_ride_request):
-        # find_ride_request.id = str(uuid.uuid4())
-
+        # Estimate the price of the ride
         distance_km = self.map_location_client.compute_distance_km(find_ride_request.start_location, find_ride_request.end_location)
         estimated_price = self.pricing_client.compute_cost_based_on_distance(distance_km)
 
         driver_accepted = False
-        candidate = None
-
         drivers_declined = 0
 
-        while driver_accepted is False:
-            while candidate is None:
-                candidate = self.driver_matching_client.find_driver(find_ride_request)
+        # Get driver candidates
+        candidates = self.driver_matching_client.find_driver_candidates(find_ride_request)
+        chosen_driver = None
 
+        # Find the first one which accepts
+        for candidate in candidates:
             driver_accepted = self.driver_operations_client.ask_for_ride(candidate, find_ride_request)
-            if not driver_accepted:
+            if driver_accepted:
+                chosen_driver = candidate
+                break
+            else:
                 drivers_declined += 1
-                time.sleep(1)
 
+        # If we still haven't found a driver
+        if not chosen_driver:
+            raise DriverNotFoundException(f"All {len(candidates)} drivers declined the ride")
+
+        # Happy journey!
         flask_app.logger.info(f"{drivers_declined} drivers declined before a ride could be found")
-        ride = self.driver_operations_client.create_ride(candidate, find_ride_request)
-        return FindRideResponse(driver=ride['driver'], estimated_cost=estimated_price)
+        self.driver_operations_client.create_ride(chosen_driver, find_ride_request)
+        return FindRideResponse(driver=chosen_driver, estimated_cost=estimated_price)
 
 
-map_location_client = MapLocationService()
-driver_availability_client = DriverAvailabilityService(map_location_client)
-driver_matching_client = DriverMatchingService(driver_availability_client)
+google_maps_client = GoogleMapsService()
+map_location_client = MapLocationService(google_maps_client)
+driver_matching_client = DriverMatchingService(map_location_client)
 driver_operations_client = DriverOperationsService()
 pricing_client = PricingService()
 ride_client = RideService(driver_matching_client, driver_operations_client, map_location_client, pricing_client)
 
-driver_availability_client.add_available_driver(Driver())
-driver_availability_client.add_available_driver(Driver())
-driver_availability_client.add_available_driver(Driver())
+driver_matching_client.add_available_driver(Driver())
+driver_matching_client.add_available_driver(Driver())
+driver_matching_client.add_available_driver(Driver())
 
 
 def find_ride(body):
