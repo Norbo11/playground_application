@@ -126,6 +126,7 @@ class RideService(object):
             driver_accepted = self.driver_operations_client.ask_for_ride(candidate, find_ride_request)
             if not driver_accepted:
                 drivers_declined += 1
+                time.sleep(1)
 
         flask_app.logger.info(f"{drivers_declined} drivers declined before a ride could be found")
         ride = self.driver_operations_client.create_ride(candidate, find_ride_request)
