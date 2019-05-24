@@ -125,7 +125,7 @@ class RideService(object):
         drivers_declined = 0
 
         # Get driver candidates
-        candidates = self.driver_matching_client.find_driver_candidates(find_ride_request)
+        candidates = self.driver_matching_client.find_driver_candidates(find_ride_request.start_location)
         chosen_driver = None
 
         # Find the first one which accepts
