@@ -138,13 +138,27 @@ class RideService(object):
                 drivers_declined += 1
 
         # If we still haven't found a driver
-        if not chosen_driver:
+        if chosen_driver == False:
             raise DriverNotFoundException(f"All {len(candidates)} drivers declined the ride")
 
         # Happy journey!
         flask_app.logger.info(f"{drivers_declined} drivers declined before a ride could be found")
         self.driver_operations_client.create_ride(chosen_driver, find_ride_request)
         return FindRideResponse(driver=chosen_driver, estimated_cost=estimated_price)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 google_maps_client = GoogleMapsService()

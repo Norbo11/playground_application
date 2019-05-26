@@ -20,7 +20,7 @@ flask_app.config.update(
     DEBUG=True,
 )
 
-instrument_flask(flask_app, './uber_feedback.yaml')
+instrument_flask(flask_app, './feedback.yaml')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8081, debug=True)
