@@ -41,7 +41,7 @@ class Driver(DriverModel):
 
 class MapLocationService(object):
 
-    def __init__(self, google_maps_client):
+    def __init__(self, google_maps_client: GoogleMapsService):
         self.last_auth_token = None
         self.last_auth_time = datetime.min
         self.google_maps_client = google_maps_client
@@ -56,7 +56,7 @@ class MapLocationService(object):
 
 class DriverMatchingService(object):
 
-    def __init__(self, map_location_client):
+    def __init__(self, map_location_client: MapLocationService):
         self.available_drivers = []
         self.map_location_client = map_location_client
 
@@ -110,7 +110,11 @@ class PricingService(object):
 
 class RideService(object):
 
-    def __init__(self, driver_matching_client, driver_operations_client, map_location_client, pricing_client):
+    def __init__(self,
+                 driver_matching_client: DriverMatchingService,
+                 driver_operations_client: DriverOperationsService,
+                 map_location_client: MapLocationService,
+                 pricing_client: PricingService):
         self.driver_matching_client = driver_matching_client
         self.driver_operations_client = driver_operations_client
         self.map_location_client = map_location_client
