@@ -5,6 +5,6 @@ metric_backend_url: http://host.docker.internal:8080/api
 git_base_path: "../"
 source_base_path: "../"
 instrument_file_globs:
-  - "ride_service/**"
+  - "playground_application/**"
 
 
