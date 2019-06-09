@@ -47,7 +47,7 @@ class MapLocationService(object):
         self.google_maps_client = google_maps_client
 
     def compute_distance_km(self, a, b):
-        if datetime.now() - self.last_auth_time > timedelta(seconds=1):
+        if datetime.now() - self.last_auth_time > timedelta(hours=1):
             self.last_auth_token = self.google_maps_client.authenticate()
             self.last_auth_time = datetime.now()
 
@@ -181,6 +181,26 @@ def find_ride(body):
     find_ride_request = FindRideRequest.from_dict(body)
     find_ride_response = ride_client.find_ride(find_ride_request)
     return find_ride_response.to_dict()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
