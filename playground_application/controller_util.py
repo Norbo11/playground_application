@@ -1,7 +1,7 @@
 import pandas as pd
 import math
 
-from playground_application.models import Number
+from playground_application.models.number import Number
 
 
 def load_large_csv():

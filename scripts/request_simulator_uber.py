@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
-BASE_PATH = 'http://localhost:{}/api/'
+BASE_PATH = 'http://localhost:{}/uber/'
 
 def main():
     logger.info('Starting requests simulator')
@@ -26,7 +26,16 @@ def main():
         logger.info(f'Sending request to {endpoint}')
 
         try:
-            response = requests.get(endpoint)
+            response = requests.post(endpoint, json={
+                'start_location': {
+                    'x': 0,
+                    'y': 0
+                },
+                'end_location': {
+                    'x': 100,
+                    'y': 100
+                }
+            })
 
             print(response)
         except:

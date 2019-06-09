@@ -1,5 +1,5 @@
 #!/bin/bash
-python example.py $1 $2 &
+python threaded_example.py $1 $2 &
 PID=$!
 echo "Running pyflame-bleeding -p $PID ${@:3} > output_$1_$2.txt"
 pyflame-bleeding -p $PID ${@:3} > output_$1_$2.txt
