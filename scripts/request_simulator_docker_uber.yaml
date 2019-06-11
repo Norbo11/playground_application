@@ -1,0 +1,16 @@
+base_path: http://localhost:4001/uber
+sleep_time: 0
+results_file: request_simulator.csv
+endpoints:
+  find_ride:
+    method: post
+    json: '{
+      "start_location": {
+        "x": 0,
+        "y": 0
+      },
+      "end_location": {
+        "x": 100,
+        "y": 100
+      }
+    }'

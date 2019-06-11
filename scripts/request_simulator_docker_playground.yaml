@@ -1,0 +1,6 @@
+base_path: http://localhost:4001/api/
+sleep_time: 0
+results_file: request_simulator.csv
+endpoints:
+  - one
+  - two

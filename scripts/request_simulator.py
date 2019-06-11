@@ -1,41 +1,49 @@
 import sys
-
 import requests
 import random
 import time
 import logging
 
+import yaml
+import json
+from yaml import CLoader
+import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
-
 logger = logging.getLogger(__name__)
 
-BASE_PATH = 'http://localhost:{}/api/'
 
 def main():
     logger.info('Starting requests simulator')
-    sleep_time = int(sys.argv[1])
-    port = sys.argv[2]
-    endpoints = sys.argv[3:]
 
-    reqs = 0
-    while True:
-        endpoint = random.choice(endpoints)
-        endpoint = BASE_PATH.format(port) + endpoint
+    config_filename = sys.argv[1]
+    total_requests = int(sys.argv[2])
+
+    with open(config_filename, 'r') as config_file:
+        config = yaml.load(config_file, Loader=CLoader)
+
+    req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status'])
+
+    for i in range(total_requests):
+        endpoints_dict = config['endpoints']
+        endpoint = random.choice(list(endpoints_dict.keys()))
 
         logger.info(f'Sending request to {endpoint}')
 
-        try:
-            response = requests.get(endpoint)
+        start_time = time.time()
+        body = json.loads(endpoints_dict[endpoint]['json']) if 'json' in endpoints_dict[endpoint] else None
+        response = requests.request(endpoints_dict[endpoint]['method'], config['base_path'] + '/' + endpoint, json=body)
+        end_time = time.time()
 
-            print(response)
-        except:
-            pass
+        req_df.loc[i] = {'endpoint': endpoint,
+                         'duration': end_time - start_time,
+                         'status': response.status_code}
 
-        reqs += 1 
-        time.sleep(sleep_time)
+        time.sleep(config['sleep_time'])
+        req_df.to_csv(config['results_file'])
 
-    logger.info(f'Sent {reqs} requests')
-    
+    logger.info(f'Sent {total_requests} requests')
+
+
 if __name__ == '__main__':
     main()
