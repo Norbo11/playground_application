@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoadedCsv'
+                $ref: '#/components/schemas/Number'
   /log:
     get:
       operationId: playground_application.controllers.experiments.log
@@ -157,8 +157,8 @@ components:
       type: object
       properties:
         i:
-          format: int32
-          type: integer
+          type: number
+          format: double
       required:
       - i
     LoadedCsv:

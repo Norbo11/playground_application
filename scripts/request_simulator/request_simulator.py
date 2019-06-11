@@ -23,7 +23,7 @@ def main():
     with open(config_filename, 'r') as config_file:
         config = yaml.load(config_file, Loader=CLoader)
 
-    req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status'])
+    req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status', 'response'])
 
     for i in range(total_requests):
         endpoints_dict = config['endpoints']
@@ -38,7 +38,9 @@ def main():
 
         req_df.loc[i] = {'endpoint': endpoint,
                          'duration': end_time - start_time,
-                         'status': response.status_code}
+                         'status': response.status_code,
+                         'response': response.json()['i'] if response.ok else ""
+                         }
 
         time.sleep(config['sleep_time'])
         req_df.to_csv(results_filename)

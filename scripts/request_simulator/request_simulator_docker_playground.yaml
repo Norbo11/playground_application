@@ -11,3 +11,5 @@ endpoints:
     method: get
   add_numbers:
     method: get
+  add_numbers_numpy:
+    method: get

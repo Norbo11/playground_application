@@ -1,7 +1,15 @@
 base_path: http://cloud-vm-46-203.doc.ic.ac.uk:8081/api
 sleep_time: 0
 endpoints:
-  one:
+  load_large_file:
     method: get
-  two:
+  sleep:
+    method: get
+  log:
+    method: get
+  throw_exception:
+    method: get
+  add_numbers:
+    method: get
+  add_numbers_numpy:
     method: get
