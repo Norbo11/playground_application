@@ -37,7 +37,6 @@ def load_large_file():
 @report_running_time
 def sleep():
     time.sleep(3)
-    return Number(42).to_dict()
 
 
 # I/O bound (logging)
@@ -45,7 +44,6 @@ def sleep():
 def log():
     for i in range(9999):
         current_app.logger.info(f"Logging number {i}")
-    return Number(i).to_dict()
 
 
 # CPU bound
@@ -55,8 +53,6 @@ def add_numbers():
     for i in range(10_000_000):
         result += random.random()
 
-    return Number(result).to_dict()
-
 
 # CPU bound
 @report_running_time
@@ -65,7 +61,6 @@ def add_numbers_numpy():
     mean = a.mean()
     std = a.std()
     variance = a.var()
-    return Number(mean).to_dict()
 
 
 # Exception
