@@ -1,0 +1,7 @@
+base_path: http://cloud-vm-46-203.doc.ic.ac.uk:8081/api
+sleep_time: 0
+endpoints:
+  one:
+    method: get
+  two:
+    method: get

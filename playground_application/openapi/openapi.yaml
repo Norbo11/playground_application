@@ -85,6 +85,72 @@ paths:
                     $ref: '#/components/schemas/Number'
                   second:
                     $ref: '#/components/schemas/Number'
+  /load_large_file:
+    get:
+      operationId: playground_application.controllers.experiments.load_large_file
+      parameters: []
+      responses:
+        200:
+          description: "Load large file"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadedCsv'
+  /log:
+    get:
+      operationId: playground_application.controllers.experiments.log
+      parameters: []
+      responses:
+        200:
+          description: "Log a bunch of times"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+  /add_numbers:
+    get:
+      operationId: playground_application.controllers.experiments.add_numbers
+      parameters: []
+      responses:
+        200:
+          description: "Add random numbers"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+  /add_numbers_numpy:
+    get:
+      operationId: playground_application.controllers.experiments.add_numbers_numpy
+      parameters: []
+      responses:
+        200:
+          description: "Do numpy computations on numpy numbers"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+  /sleep:
+    get:
+      operationId: playground_application.controllers.experiments.sleep
+      parameters: []
+      responses:
+        200:
+          description: "Sleep for a bit"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+  /throw_exception:
+    get:
+      operationId: playground_application.controllers.experiments.throw_exception
+      parameters: []
+      responses:
+        200:
+          description: "Throw an exception"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
 components:
   schemas:
     Number:

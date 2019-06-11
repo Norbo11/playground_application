@@ -17,7 +17,8 @@ def main():
     logger.info('Starting requests simulator')
 
     config_filename = sys.argv[1]
-    total_requests = int(sys.argv[2])
+    results_filename = sys.argv[2]
+    total_requests = int(sys.argv[3])
 
     with open(config_filename, 'r') as config_file:
         config = yaml.load(config_file, Loader=CLoader)
@@ -40,7 +41,7 @@ def main():
                          'status': response.status_code}
 
         time.sleep(config['sleep_time'])
-        req_df.to_csv(config['results_file'])
+        req_df.to_csv(results_filename)
 
     logger.info(f'Sent {total_requests} requests')
 

@@ -1,6 +1,13 @@
-base_path: http://localhost:4001/api/
+base_path: http://localhost:4000/api
 sleep_time: 0
-results_file: request_simulator.csv
 endpoints:
-  - one
-  - two
+  load_large_file:
+    method: get
+  sleep:
+    method: get
+  log:
+    method: get
+  throw_exception:
+    method: get
+  add_numbers:
+    method: get

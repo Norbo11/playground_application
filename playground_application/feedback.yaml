@@ -1,3 +1,4 @@
+enable: false
 application_name: playground_application
 metric_backend_url: http://host.docker.internal:8080/api
 
