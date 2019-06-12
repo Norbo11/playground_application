@@ -13,7 +13,6 @@ from playground_application.models.loaded_csv import LoadedCsv
 from playground_application.models.number import Number  # noqa: E501
 from playground_application import controller_util
 
-
 def report_running_time(f):
     def wrapped():
         start_time = time.time()
