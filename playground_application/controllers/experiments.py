@@ -19,7 +19,7 @@ def report_running_time(f):
         start_time = time.time()
         f()
         end_time = time.time()
-        return Number(end_time - start_time).to_dict()
+        return end_time - start_time
 
     return wrapped
 

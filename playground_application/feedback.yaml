@@ -1,4 +1,9 @@
-enable: false
+enable: true
+instrument_performance: false
+instrument_exceptions: false
+instrument_logs: false
+save_flamegraph: false
+send_to_backend: false
 application_name: playground_application
 metric_backend_url: http://host.docker.internal:8080/api
 

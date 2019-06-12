@@ -3,7 +3,7 @@ import requests
 import random
 import time
 import logging
-
+import itertools
 import yaml
 import json
 from yaml import CLoader
@@ -23,11 +23,13 @@ def main():
     with open(config_filename, 'r') as config_file:
         config = yaml.load(config_file, Loader=CLoader)
 
-    req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status', 'response'])
+    req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status', 'controller_time', 'request_time'])
+    endpoints_dict = config['endpoints']
+    endpoints = list(endpoints_dict.keys())
 
-    for i in range(total_requests):
-        endpoints_dict = config['endpoints']
-        endpoint = random.choice(list(endpoints_dict.keys()))
+    for i, endpoint in enumerate(itertools.cycle(endpoints)):
+        if i == total_requests:
+            break
 
         logger.info(f'Sending request to {endpoint}')
 
@@ -39,7 +41,8 @@ def main():
         req_df.loc[i] = {'endpoint': endpoint,
                          'duration': end_time - start_time,
                          'status': response.status_code,
-                         'response': response.json()['i'] if response.ok else ""
+                         'controller_time': response.json()['controller_time'] if response.ok else "",
+                         'request_time': response.json()['request_time'] if response.ok else "",
                          }
 
         time.sleep(config['sleep_time'])

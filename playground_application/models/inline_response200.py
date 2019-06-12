@@ -15,21 +15,26 @@ class InlineResponse200(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, status=None):  # noqa: E501
+    def __init__(self, first=None, second=None):  # noqa: E501
         """InlineResponse200 - a model defined in OpenAPI
 
-        :param status: The status of this InlineResponse200.  # noqa: E501
-        :type status: str
+        :param first: The first of this InlineResponse200.  # noqa: E501
+        :type first: Dict[str, List[float]]
+        :param second: The second of this InlineResponse200.  # noqa: E501
+        :type second: Dict[str, List[float]]
         """
         self.openapi_types = {
-            'status': str
+            'first': Dict[str, List[float]],
+            'second': Dict[str, List[float]]
         }
 
         self.attribute_map = {
-            'status': 'status'
+            'first': 'first',
+            'second': 'second'
         }
 
-        self._status = status
+        self._first = first
+        self._second = second
 
     @classmethod
     def from_dict(cls, dikt) -> 'InlineResponse200':
@@ -43,22 +48,43 @@ class InlineResponse200(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def status(self):
-        """Gets the status of this InlineResponse200.
+    def first(self):
+        """Gets the first of this InlineResponse200.
 
 
-        :return: The status of this InlineResponse200.
-        :rtype: str
+        :return: The first of this InlineResponse200.
+        :rtype: Dict[str, List[float]]
         """
-        return self._status
+        return self._first
 
-    @status.setter
-    def status(self, status):
-        """Sets the status of this InlineResponse200.
+    @first.setter
+    def first(self, first):
+        """Sets the first of this InlineResponse200.
 
 
-        :param status: The status of this InlineResponse200.
-        :type status: str
+        :param first: The first of this InlineResponse200.
+        :type first: Dict[str, List[float]]
         """
 
-        self._status = status
+        self._first = first
+
+    @property
+    def second(self):
+        """Gets the second of this InlineResponse200.
+
+
+        :return: The second of this InlineResponse200.
+        :rtype: Dict[str, List[float]]
+        """
+        return self._second
+
+    @second.setter
+    def second(self, second):
+        """Sets the second of this InlineResponse200.
+
+
+        :param second: The second of this InlineResponse200.
+        :type second: Dict[str, List[float]]
+        """
+
+        self._second = second

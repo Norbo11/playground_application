@@ -155,12 +155,10 @@ components:
   schemas:
     Number:
       type: object
-      properties:
-        i:
+      additionalProperties:
+        items:
           type: number
           format: double
-      required:
-      - i
     LoadedCsv:
       type: object
       properties:
