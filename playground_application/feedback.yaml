@@ -1,6 +1,14 @@
-enable: false
+enable: true
+send_to_backend: false
+instrument_performance: true
+instrument_exceptions: false
+instrument_logs: false
+save_flamegraph: true
+
 application_name: playground_application
-metric_backend_url: http://host.docker.internal:8080/api
+# metric_backend_url: http://host.docker.internal:8080/api
+metric_backend_url: http://localhost:8080/api
+pyflame_sampling_rate: 0.01
 
 # These directories are relative to flask_app.root_path.
 # feedback.yaml needs to be in the same directory for the IDE plugin to treat the below as relative
