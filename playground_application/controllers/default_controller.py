@@ -12,7 +12,8 @@ from playground_application import controller_util
 
 def sleep(i):
     time.sleep(i)
-    time.sleep(1)
+    if (i == 1):
+        time.sleep(1)
     return i
 
 def one_get():
