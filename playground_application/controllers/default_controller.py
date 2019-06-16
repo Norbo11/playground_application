@@ -36,7 +36,7 @@ def two_get():
     :rtype: Number
     """
     current_app.logger.info('Executed two')
-    sleep(1)
+    sleep(2)
     sleep(1)
     sleep(2)
     controller_util.throw_exception()
