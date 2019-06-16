@@ -8,7 +8,10 @@ from datetime import datetime, timedelta
 
 from flask import current_app as flask_app
 from multiprocessing import Queue, Process
-from playground_application.models import Driver as DriverModel, Location, FindRideRequest, FindRideResponse
+from playground_application.models.driver import Driver as DriverModel
+from playground_application.models.location import Location
+from playground_application.models.find_ride_request import FindRideRequest
+from playground_application.models.find_ride_response import FindRideResponse
 
 
 class DriverNotFoundException(Exception):

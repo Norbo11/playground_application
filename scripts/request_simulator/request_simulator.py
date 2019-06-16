@@ -38,12 +38,12 @@ def main():
         response = requests.request(endpoints_dict[endpoint]['method'], config['base_path'] + '/' + endpoint, json=body)
         end_time = time.time()
 
-        req_df.loc[i] = {'endpoint': endpoint,
-                         'duration': end_time - start_time,
-                         'status': response.status_code,
-                         'controller_time': response.json()['controller_time'] if response.ok else "",
-                         'request_time': response.json()['request_time'] if response.ok else "",
-                         }
+        # req_df.loc[i] = {'endpoint': endpoint,
+        #                  'duration': end_time - start_time,
+        #                  'status': response.status_code,
+        #                  'controller_time': response.json()['controller_time'] if response.ok else "",
+        #                  'request_time': response.json()['request_time'] if response.ok else "",
+        #                  }
 
         time.sleep(config['sleep_time'])
         req_df.to_csv(results_filename)
