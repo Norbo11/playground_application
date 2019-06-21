@@ -53,7 +53,7 @@ class MapLocationService(object):
         self.google_maps_client = google_maps_client
 
     def compute_distance_km(self, a, b):
-        if datetime.now() - self.last_auth_time > timedelta(seconds=1):
+        if datetime.now() - self.last_auth_time > timedelta(hours=1):
             self.last_auth_token = self.google_maps_client.authenticate()
             self.last_auth_time = datetime.now()
 

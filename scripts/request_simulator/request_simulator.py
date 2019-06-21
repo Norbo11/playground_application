@@ -33,10 +33,14 @@ def main():
 
         logger.info(f'Sending request to {endpoint}')
 
-        start_time = time.time()
-        body = json.loads(endpoints_dict[endpoint]['json']) if 'json' in endpoints_dict[endpoint] else None
-        response = requests.request(endpoints_dict[endpoint]['method'], config['base_path'] + '/' + endpoint, json=body)
-        end_time = time.time()
+        try:
+            start_time = time.time()
+            body = json.loads(endpoints_dict[endpoint]['json']) if 'json' in endpoints_dict[endpoint] else None
+            response = requests.request(endpoints_dict[endpoint]['method'], config['base_path'] + '/' + endpoint, json=body)
+            end_time = time.time()
+        except Exception as e:
+            print("cch")
+            logger.warning(f"Exception: {e}")
 
         # req_df.loc[i] = {'endpoint': endpoint,
         #                  'duration': end_time - start_time,
