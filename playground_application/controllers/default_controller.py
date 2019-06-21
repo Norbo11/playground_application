@@ -21,7 +21,6 @@ def one_get():
 
     The one.
 
-
     :rtype: Number
     """
     current_app.logger.info('Executed one (woke up at %s)', str(time.time()))
