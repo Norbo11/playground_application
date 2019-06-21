@@ -25,7 +25,7 @@ class GoogleMapsService(object):
         return str(uuid.uuid4())
 
     def compute_distance_km(self, auth_token, a, b):
-        time.sleep(0.5)
+        time.sleep(1)
         distance = math.sqrt(math.pow(a.x - b.x, 2) + math.pow(a.y - b.y, 2))
         if distance < 30:
             raise Exception("The Google Maps API was not reachable at this time.")
