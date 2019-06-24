@@ -7,16 +7,13 @@ build:
     - mkdir playground_application
     - mv !(playground_application) playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
-    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
-#    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
-    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/DockerfileUber .
-#    - docker build --tag=playground_application .
-    - docker build --tag=playground_application -f DockerfileUber .
+    - cp -r /home/np1815/Individual-Project/feedback_driven_development/feedback_wrapper .
 deploy:
   stage: deploy
   script:
-    - docker stop playground_application_prod || true
-    - docker container rm playground_application_prod || true
-    - docker run --detach --cap-add=SYS_PTRACE -p 4001:8081 --name playground_application_prod playground_application
+    - kill $RUNNING_SERVER && true
+    - cd /home/np1815/Individual-Project/feedback_driven_development/playground_application
+    - ./run_gunicorn.sh &
+    - export RUNNING_SERVER=$1
   only:
     - master
