@@ -12,9 +12,9 @@ build:
 deploy:
   stage: deploy
   script:
-    - sudo kill $RUNNING_SERVER && true
-    - sudo /home/np1815/miniconda3/bin/conda activate playground_application
-    - sudo ./run_gunicorn.sh &
-    - sudo export RUNNING_SERVER=$1
+    - kill $RUNNING_SERVER && true
+    - /home/np1815/miniconda3/bin/conda activate playground_application
+    - ./run_gunicorn.sh &
+    - export RUNNING_SERVER=$1
   only:
     - master
