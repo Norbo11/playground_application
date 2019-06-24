@@ -8,7 +8,6 @@ build:
     - mv !(playground_application) playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
     - cp -r /home/np1815/Individual-Project/feedback_driven_development/feedback_wrapper .
-
 deploy:
   stage: deploy
   script:
