@@ -21,7 +21,7 @@ class DriverNotFoundException(Exception):
 class GoogleMapsService(object):
 
     def authenticate(self):
-        time.sleep(1)
+        time.sleep(3)
         return str(uuid.uuid4())
 
     def compute_distance_km(self, auth_token, a, b):
