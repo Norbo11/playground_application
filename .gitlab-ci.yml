@@ -7,14 +7,16 @@ build:
     - mkdir playground_application
     - mv !(playground_application) playground_application
     - mv playground_application/playground_application_temp playground_application/playground_application
-    - sudo cp -r /home/np1815/Individual-Project/feedback_driven_development/feedback_wrapper .
-    - sudo chmod -R 0777 .
+    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/feedback_wrapper .
+#    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/Dockerfile .
+    - cp -r /Users/Norbz/Documents/Imperial/4th-Year/Individual-Project/feedback_driven_development/DockerfileUber .
+#    - docker build --tag=playground_application .
+    - docker build --tag=playground_application -f DockerfileUber .
 deploy:
   stage: deploy
   script:
-    - kill $RUNNING_SERVER && true
-    - /home/np1815/miniconda3/bin/conda activate playground_application
-    - ./run_gunicorn.sh &
-    - export RUNNING_SERVER=$1
+    - docker stop playground_application_prod || true
+    - docker container rm playground_application_prod || true
+    - docker run --detach --cap-add=SYS_PTRACE -p 4001:8081 --name playground_application_prod playground_application
   only:
     - master
