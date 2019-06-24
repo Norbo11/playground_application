@@ -13,6 +13,7 @@ deploy:
   stage: deploy
   script:
     - kill $RUNNING_SERVER && true
+    - conda activate playground_application
     - ./run_gunicorn.sh &
     - export RUNNING_SERVER=$1
   only:
