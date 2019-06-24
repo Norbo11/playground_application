@@ -12,9 +12,8 @@ build:
 deploy:
   stage: deploy
   script:
-    - sudo -i
     - kill $RUNNING_SERVER && true
-    - cd /home/np1815/Individual-Project/feedback_driven_development/playground_application
+    - cd playground_application
     - ./run_gunicorn.sh &
     - export RUNNING_SERVER=$1
   only:
