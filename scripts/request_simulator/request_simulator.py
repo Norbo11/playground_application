@@ -24,33 +24,25 @@ def main():
         config = yaml.load(config_file, Loader=CLoader)
 
     req_df = pd.DataFrame(columns=['endpoint', 'duration', 'status', 'controller_time', 'request_time'])
-    endpoints_dict = config['endpoints']
-    endpoints = list(endpoints_dict.keys())
+    endpoints = config['endpoints']
 
-    for i, endpoint in enumerate(itertools.cycle(endpoints)):
+    for i, endpoint_dict in enumerate(itertools.cycle(endpoints)):
         if i == total_requests:
             break
 
+        endpoint = endpoint_dict['endpoint']
         logger.info(f'Sending request to {endpoint}')
 
         try:
             start_time = time.time()
-            body = json.loads(endpoints_dict[endpoint]['json']) if 'json' in endpoints_dict[endpoint] else None
-            response = requests.request(endpoints_dict[endpoint]['method'], config['base_path'] + '/' + endpoint, json=body)
+            body = json.loads(endpoint_dict['json']) if 'json' in endpoint_dict else None
+            params = json.loads(endpoint_dict['params']) if 'params' in endpoint_dict else None
+            response = requests.request(endpoint_dict['method'], config['base_path'] + '/' + endpoint, json=body, params=params)
             end_time = time.time()
         except Exception as e:
-            print("cch")
             logger.warning(f"Exception: {e}")
 
-        # req_df.loc[i] = {'endpoint': endpoint,
-        #                  'duration': end_time - start_time,
-        #                  'status': response.status_code,
-        #                  'controller_time': response.json()['controller_time'] if response.ok else "",
-        #                  'request_time': response.json()['request_time'] if response.ok else "",
-        #                  }
-
         time.sleep(config['sleep_time'])
-        req_df.to_csv(results_filename)
 
     logger.info(f'Sent {total_requests} requests')
 
