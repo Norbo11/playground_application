@@ -21,11 +21,11 @@ class DriverNotFoundException(Exception):
 class GoogleMapsService(object):
 
     def authenticate(self):
-        time.sleep(4)
+        time.sleep(1)
         return str(uuid.uuid4())
 
     def compute_distance_km(self, auth_token, a, b):
-        time.sleep(1)
+        time.sleep(0.5)
         distance = math.sqrt(math.pow(a.x - b.x, 2) + math.pow(a.y - b.y, 2))
         return distance
 
@@ -41,6 +41,40 @@ class Driver(DriverModel):
         )
 
         self.rating = int(random.random() * 5)
+
+
+class DriverOperationsService(object):
+
+    def __init__(self):
+        self.rides = []
+
+    def ask_for_ride(self, driver, ride_info):
+        time.sleep(random.randint(1, 2))
+        return random.random() > 0.5
+
+    def create_ride(self, driver, ride_info):
+        ride = {
+            'driver': driver,
+            'ride_info': ride_info
+        }
+
+        return ride
+
+
+class PricingService(object):
+
+    def __init__(self):
+        pass
+
+    def compute_cost_based_on_distance(self, distance_km):
+        if distance_km <= 5:
+            cost_dollars = 5
+        elif distance_km < 15:
+            cost_dollars = distance_km
+        else:
+            cost_dollars = distance_km * 0.7
+
+        return cost_dollars
 
 
 class MapLocationService(object):
@@ -76,40 +110,6 @@ class DriverMatchingService(object):
         sorted_by_rating = sorted(sorted_by_distance, key=lambda driver: driver.rating, reverse=True)
 
         return sorted_by_rating
-
-
-class DriverOperationsService(object):
-
-    def __init__(self):
-        self.rides = []
-
-    def ask_for_ride(self, driver, ride_info):
-        time.sleep(random.randint(1, 3))
-        return random.random() > 0.5
-
-    def create_ride(self, driver, ride_info):
-        ride = {
-            'driver': driver,
-            'ride_info': ride_info
-        }
-
-        return ride
-
-
-class PricingService(object):
-
-    def __init__(self):
-        pass
-
-    def compute_cost_based_on_distance(self, distance_km):
-        if distance_km <= 5:
-            cost_dollars = 5
-        elif distance_km < 15:
-            cost_dollars = distance_km
-        else:
-            cost_dollars = distance_km * 0.7
-
-        return cost_dollars
 
 
 class RideService(object):
