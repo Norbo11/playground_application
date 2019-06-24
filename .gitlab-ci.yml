@@ -13,7 +13,6 @@ deploy:
   stage: deploy
   script:
     - kill $RUNNING_SERVER && true
-    - cd playground_application
     - ./run_gunicorn.sh &
     - export RUNNING_SERVER=$1
   only:
